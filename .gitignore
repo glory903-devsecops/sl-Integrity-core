@@ -1,0 +1,7 @@
+venv/
+__pycache__/
+*.pyc
+.DS_Store
+factory_integrity.db
+.env
+docs/images/

@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+sqlalchemy
+dirhash
+pydantic
+pydantic-settings
+python-multipart
+pytest
+# python-oracledb  # Oracle 연동이 필요할 때만 주석 해제 후 설치하세요.

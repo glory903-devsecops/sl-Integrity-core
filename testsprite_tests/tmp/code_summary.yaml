@@ -1,0 +1,41 @@
+version: "2"
+type: backend
+tech_stack:
+  - Python
+  - FastAPI
+  - SQLAlchemy 2.0
+  - Oracle (via python-oracledb)
+  - dirhash
+features:
+  - name: Factory Integrity Management
+    description: Register baselines and scan directories for integrity.
+    files:
+      - app/main.py
+      - app/models.py
+      - app/core/hashing.py
+    endpoints:
+      - method: POST
+        path: /baselines/
+        description: Create a new baseline for a factory asset
+        auth_required: false
+        response_schema:
+          "200": Baseline
+      - method: GET
+        path: /baselines/
+        description: List all registered baselines
+        auth_required: false
+        response_schema:
+          "200": Baseline[]
+      - method: POST
+        path: /baselines/{baseline_id}/scan
+        description: Trigger a background integrity scan for a baseline
+        auth_required: false
+        response_schema:
+          "200": dict
+      - method: GET
+        path: /scans/
+        description: List all integrity scan results
+        auth_required: false
+        response_schema:
+          "200": ScanResult[]
+known_limitations: []

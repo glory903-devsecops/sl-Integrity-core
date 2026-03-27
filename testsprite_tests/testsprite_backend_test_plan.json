@@ -1,0 +1,42 @@
+[
+  {
+    "id": "TC001",
+    "title": "post baselines create new baseline",
+    "description": "Test the POST /baselines/ endpoint with a valid baseline payload containing name, path, and metadata. Verify that the response status is 200 and the response body contains the created Baseline object with an id."
+  },
+  {
+    "id": "TC002",
+    "title": "post baselines missing required fields",
+    "description": "Test the POST /baselines/ endpoint with a payload missing required fields such as name or path. Verify that the response status is 400 and the response contains validation error details."
+  },
+  {
+    "id": "TC003",
+    "title": "get baselines list all baselines",
+    "description": "Test the GET /baselines/ endpoint to retrieve all registered baselines. Verify that the response status is 200 and the response body contains a list of Baseline objects including any previously created baselines."
+  },
+  {
+    "id": "TC004",
+    "title": "get baselines database unavailable",
+    "description": "Simulate a database unavailability scenario and test the GET /baselines/ endpoint. Verify that the response status is 500 and the response contains an error payload indicating database access issues."
+  },
+  {
+    "id": "TC005",
+    "title": "post baselines scan trigger background scan",
+    "description": "Test the POST /baselines/{baseline_id}/scan endpoint with an existing baseline_id. Verify that the response status is 200 and the response body contains a task_id and a status indicating the scan is queued."
+  },
+  {
+    "id": "TC006",
+    "title": "post baselines scan nonexistent baseline",
+    "description": "Test the POST /baselines/{baseline_id}/scan endpoint with a non-existent baseline_id. Verify that the response status is 404 and the response contains an error message indicating baseline not found."
+  },
+  {
+    "id": "TC007",
+    "title": "get scans list all scan results",
+    "description": "Test the GET /scans/ endpoint to retrieve all integrity scan results. Verify that the response status is 200 and the response body contains a paginated list of ScanResult objects with their statuses."
+  },
+  {
+    "id": "TC008",
+    "title": "get scans invalid query parameter",
+    "description": "Test the GET /scans/ endpoint with an invalid query parameter such as invalid_param=xyz. Verify that the response status is 400 and the response contains a query parameter validation error."
+  }
+]
