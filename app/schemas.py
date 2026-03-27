@@ -13,6 +13,7 @@ class BaselineCreate(BaselineBase):
 class Baseline(BaselineBase):
     id: int
     current_hash: str
+    is_consistent: bool = True
     created_at: datetime
 
     class Config:

@@ -12,6 +12,7 @@ class Baseline(Base):
     path: Mapped[str] = mapped_column(String(500), nullable=False)
     description: Mapped[Optional[str]] = mapped_column(String(1000))
     current_hash: Mapped[str] = mapped_column(String(128), nullable=False)
+    is_consistent: Mapped[bool] = mapped_column(Boolean, default=True)
     last_scanned_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 

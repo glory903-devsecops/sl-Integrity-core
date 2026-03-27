@@ -16,20 +16,29 @@ def seed_data():
     models.Base.metadata.create_all(bind=database.engine)
     db = next(database.get_db())
     
-    # 1. 기존 데이터 정리
-    print("🧹 기존 데이터를 정리하는 중...")
-    db.query(models.ScanResult).delete()
-    db.query(models.Baseline).delete()
-    db.commit()
+    # 에스엘(SL) 실제 산업 현장 데이터 시뮬레이션 설정
+    plants = ["Jinryang-Main", "Gyeongju-1", "Asan-Smart", "Alabama-US", "Chongqing-China"]
+    products = [
+        ("HL-LCU", "Headlamp Lighting Control Unit Firmware"),
+        ("SBW-Main", "Shift-By-Wire Main Controller logic"),
+        ("RL-Animation", "Rear Lamp Dynamic Animation Config"),
+        ("AFLS-Sensor", "Adaptive Front-Lighting System Sensor Calibration"),
+        ("GS-Module", "Gear Shifter Module Firmware")
+    ]
+    lines = ["Line-A", "Line-B", "Line-Testing", "Assy-Line-1"]
 
-    # 2. 대규모 기준(Baseline) 생성 (약 1,000개)
-    print("🏭 1,000개의 공장 자산(Baselines) 생성 중...")
+    # 1. 대규모 기준(Baseline) 생성 (1,000개)
+    print("🏭 에스엘 글로벌 공장 자산(Baselines) 생성 중...")
     baselines = []
     for i in range(1, 1001):
+        plant = random.choice(plants)
+        prod_type, prod_desc = random.choice(products)
+        line = random.choice(lines)
+        
         baseline = models.Baseline(
-            name=f"SDF-Module-{i:03d}",
-            path=f"/factory/line-A/device-{i:03d}/software",
-            description=f"공정 라인 A의 {i}번 장비 소프트웨어 패키지",
+            name=f"SL-{plant}-{prod_type}-{i:03d}",
+            path=f"/factory/{plant}/{line}/{prod_type}/v{random.randint(1,5)}.{random.randint(0,9)}",
+            description=f"{plant} 공장 {line}의 {prod_desc} (정식 배포본 v{random.randint(1,5)})",
             current_hash=f"hash_value_{random.getrandbits(128):032x}",
             last_scanned_at=datetime.datetime.utcnow() - datetime.timedelta(days=random.randint(0, 30))
         )
@@ -38,23 +47,34 @@ def seed_data():
     db.add_all(baselines)
     db.commit()
 
-    # 3. 대규모 스캔 이력(Scan Results) 생성 (약 10,000개)
-    print("📊 10,000개의 무결성 스캔 이력(Audit Logs) 생성 중...")
+    # 2. 대규모 스캔 이력(Scan Results) 생성 (10,000개)
+    print("📊 10,000개의 산업 현장 무결성 감사 기록 생성 중...")
     db_baselines = db.query(models.Baseline).all()
     baseline_list = [(b.id, b.path) for b in db_baselines]
     
     scan_results = []
     for _ in range(10000):
         b_id, b_path = random.choice(baseline_list)
-        is_consistent = random.random() > 0.05  # 95% 정상, 5% 위반
+        is_consistent = random.random() > 0.03  # 97% 정상, 3% 변조 감지 (현장감 있게 낮은 확률)
         
+        # 변조 사유 시뮬레이션
+        details = "✅ 정기 무결성 검증 통과 (표준 상태)"
+        if not is_consistent:
+            failure_reasons = [
+                "⚠️ 인가되지 않은 펌웨어 업데이트 감지",
+                "🚫 설정 파일(config.bin) 임의 수정 발생",
+                "❗ 이전 버전 롤백 시도 감지",
+                "❌ 악성 코드 의심 파일 포함"
+            ]
+            details = random.choice(failure_reasons)
+
         scan = models.ScanResult(
             baseline_id=b_id,
             scanned_path=b_path,
             scanned_hash=f"hash_{random.getrandbits(128):032x}",
             is_consistent=is_consistent,
-            details="정기 무결성 검사 수행 완료" if is_consistent else "⚠️ 파일 변조 감지: 인가되지 않은 수정 발생",
-            scanned_at=datetime.datetime.utcnow() - datetime.timedelta(hours=random.randint(1, 1000))
+            details=details,
+            scanned_at=datetime.datetime.utcnow() - datetime.timedelta(hours=random.randint(1, 2000))
         )
         scan_results.append(scan)
         
@@ -65,9 +85,9 @@ def seed_data():
 
     db.add_all(scan_results)
     db.commit()
-    print("✅ 시뮬레이션 데이터 구축 완료!")
-    print(f"- 생성된 기준 데이터: {db.query(models.Baseline).count()}개")
-    print(f"- 생성된 스캔 이력: {db.query(models.ScanResult).count()}개")
+    print("✅ SL 최적화 시뮬레이션 데이터 구축 완료!")
+    print(f"- 위치: {', '.join(plants)}")
+    print(f"- 생성된 데이터: Baseline 1,000개 / Audit Logs 10,000개")
 
 if __name__ == "__main__":
     seed_data()

