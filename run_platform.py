@@ -14,7 +14,7 @@ def main():
     # 1. 고정 경로 설정 (스크립트 파일의 위치로 이동)
     script_dir = os.path.dirname(os.path.abspath(__file__))
     os.chdir(script_dir)
-    print(f"🚀 SL SDF-IP 플랫폼 시작 중... (작업 디렉토리: {script_dir})")
+    print(f"🚀 sl-integrity-core 플랫폼 시작 중... (작업 디렉토리: {script_dir})")
 
     # 2. 가상환경 경로 설정 (OS별 차이)
     is_windows = platform.system() == "Windows"

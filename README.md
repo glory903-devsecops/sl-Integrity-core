@@ -1,4 +1,4 @@
-# SL Integrity-Core (에스엘 무결성 핵심 관제 시스템)
+# sl-integrity-core (에스엘 무결성 핵심 관제 시스템)
 
 ## 🏢 개요
 본 플랫폼은 **에스엘(SL) 공장혁신팀**의 **SDF(Software Defined Factory)** 구현을 위해 설계된 **엔터프라이즈급 자산 무결성 관제 솔루션**입니다. 
