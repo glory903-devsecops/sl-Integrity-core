@@ -1,5 +1,12 @@
 # SL-Integrity-Core (무결성 핵심 관제 시스템)
 
+<div align="center">
+  <a href="https://glory903-devsecops.github.io/sl-Integrity-core" target="_blank">
+    <img src="https://img.shields.io/badge/Live%20Demo-Launch%20Dashboard-0F172A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="Live Demo" />
+  </a>
+</div>
+<br/>
+
 <img src="./docs/dashboard.png" alt="Dashboard Mockup" width="100%">
 
 ## 💻 데모 및 작동 방식 (Demo & Workflow)
