@@ -1,59 +1,38 @@
-from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks, Query
+from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from sqlalchemy.orm import Session
+from ..db.session import get_db
+from ..db.repository import SQLAlchemyAssetRepository
+from ..services.hasher import DirHasher
+from ..use_cases.integrity_use_cases import IntegrityUseCase
+from ..domain.entities import Asset, DashboardStats
 from typing import List
-import datetime
-
-from ..db import session, models
-from ..schemas import schemas
-from ..services import integrity_service
 
 router = APIRouter()
 
-@router.get("/status")
-def get_status():
-    return {"status": "SL-Integrity-Core API Center Online", "timestamp": datetime.datetime.now()}
+def get_integrity_use_case(db: Session = Depends(get_db)) -> IntegrityUseCase:
+    repo = SQLAlchemyAssetRepository(db)
+    hasher = DirHasher()
+    return IntegrityUseCase(repo, hasher)
 
-@router.get("/stats", response_model=schemas.DashboardStats)
-def get_dashboard_stats(db: Session = Depends(session.get_db)):
-    return integrity_service.get_dashboard_stats(db)
+@router.get("/assets", response_model=List[Asset])
+def list_assets(use_case: IntegrityUseCase = Depends(get_integrity_use_case)):
+    return use_case.get_all_assets()
 
-@router.post("/baselines/", response_model=schemas.Baseline)
-def create_baseline(baseline: schemas.BaselineCreate, db: Session = Depends(session.get_db)):
+@router.get("/stats", response_model=DashboardStats)
+def get_stats(use_case: IntegrityUseCase = Depends(get_integrity_use_case)):
+    return use_case.get_dashboard_summary()
+
+@router.post("/scan/{asset_id}")
+def scan_asset(asset_id: int, use_case: IntegrityUseCase = Depends(get_integrity_use_case)):
     try:
-        current_hash = integrity_service.calculate_integrity_hash(baseline.path)
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Hash calculation failed: {str(e)}")
-        
-    db_baseline = models.Baseline(
-        **baseline.dict(),
-        current_hash=current_hash,
-        is_consistent=True
-    )
-    db.add(db_baseline)
-    db.commit()
-    db.refresh(db_baseline)
-    return db_baseline
-
-@router.get("/baselines/", response_model=List[schemas.Baseline])
-def list_baselines(skip: int = 0, limit: int = 100, db: Session = Depends(session.get_db)):
-    return db.query(models.Baseline).offset(skip).limit(limit).all()
-
-@router.post("/baselines/{baseline_id}/scan")
-async def trigger_scan(baseline_id: int, background_tasks: BackgroundTasks, db: Session = Depends(session.get_db)):
-    baseline = db.query(models.Baseline).filter(models.Baseline.id == baseline_id).first()
-    if not baseline:
-        raise HTTPException(status_code=404, detail="Asset not found")
-        
-    background_tasks.add_task(integrity_service.perform_scan_task, baseline_id)
-    return {"message": "Integrity scan task scheduled in background"}
+        return use_case.execute_scan(asset_id)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
 
 @router.post("/scan-all")
-async def trigger_scan_all(background_tasks: BackgroundTasks, db: Session = Depends(session.get_db)):
-    baselines = db.query(models.Baseline).all()
-    for baseline in baselines:
-        background_tasks.add_task(integrity_service.perform_scan_task, baseline.id)
-    return {"message": f"Bulk scan of {len(baselines)} assets scheduled"}
-
-@router.get("/scans/", response_model=List[schemas.ScanResult])
-def list_scans(skip: int = 0, limit: int = 100, db: Session = Depends(session.get_db)):
-    return db.query(models.ScanResult).order_by(models.ScanResult.scanned_at.desc()).offset(skip).limit(limit).all()
+def scan_all_assets(background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
+    use_case = get_integrity_use_case(db)
+    assets = use_case.get_all_assets()
+    for asset in assets:
+        background_tasks.add_task(use_case.execute_scan, asset.id)
+    return {"message": f"Scanning {len(assets)} assets in background"}

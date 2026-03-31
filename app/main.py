@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse
+from fastapi.middleware.cors import CORSMiddleware
 from .db import session, models
 from .api import endpoints
 
@@ -9,6 +10,15 @@ app = FastAPI(
     title="SL Integrity-Core",
     description="에스엘(SL) 스마트 팩토리 무결성 관제 플랫폼 (SDF)",
     version="3.0.0"
+)
+
+# Add CORS Middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # For production, specify the actual domain
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Create tables if they don't exist
