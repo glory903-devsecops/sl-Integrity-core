@@ -3,171 +3,251 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SL Integrity-Core | Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <title>SL Integrity-Core | Enterprise Asset Monitoring</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/lucide@0.344.0/dist/umd/lucide.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <div class="glass-container">
+    <div class="app-container">
         <!-- Sidebar -->
         <aside class="sidebar">
-            <div class="logo-area">
-                <div class="sl-logo">SL</div>
-                <div class="logo-text">
+            <div class="brand">
+                <div class="brand-logo">SL</div>
+                <div class="brand-info">
                     <h1>INTEGRITY-CORE</h1>
-                    <span>SDF Control Center</span>
+                    <p>SDF Control Center</p>
                 </div>
             </div>
-            <nav>
-                <a href="#" class="active"><i data-lucide="layout-dashboard"></i> 대시보드</a>
-                <a href="/docs"><i data-lucide="file-text"></i> API 명세</a>
-                <a href="https://www.slworld.com" target="_blank"><i data-lucide="globe"></i> 에스엘 공식</a>
+
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active"><i data-lucide="layout-dashboard"></i> 대시보드</a>
+                <a href="/api/status" target="_blank" class="nav-item"><i data-lucide="activity"></i> 시스템 상태</a>
+                <a href="/docs" target="_blank" class="nav-item"><i data-lucide="file-text"></i> API 명세 (Swagger)</a>
+                <a href="https://github.com/glory903-devsecops/sl-Integrity-core" target="_blank" class="nav-item"><i data-lucide="github"></i> Repository</a>
             </nav>
+
             <div class="sidebar-footer">
                 <p>© 2026 SL FACTORY INNOVATION</p>
-                <p>v2.1.0-STABLE</p>
+                <p>Enterprise Edition v3.0.0</p>
             </div>
         </aside>
 
         <!-- Main Content -->
-        <main class="content">
-            <header class="top-header">
-                <div class="breadcrumb">홈 > 대시보드</div>
-                <div class="status-badge live">LIVE MONITORING</div>
+        <main class="main-content">
+            <header>
+                <div class="page-title">
+                    <h2>자산 무결성 관제 현황</h2>
+                    <p>Software Defined Factory (SDF) 통합 보안 모니터링</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn" onclick="triggerScanAll()"><i data-lucide="refresh-cw"></i> 전체 수동 스캔</button>
+                    <div class="header-status">
+                        <span class="badge badge-success">SYSTEM ONLINE</span>
+                    </div>
+                </div>
             </header>
 
             <!-- Stats Grid -->
             <div class="stats-grid">
                 <div class="stat-card">
-                    <div class="stat-icon blue"><i data-lucide="package"></i></div>
-                    <div class="stat-info">
-                        <h3>전체 자산</h3>
-                        <p id="total-baselines">0</p>
+                    <div class="stat-header">
+                        <div class="stat-icon blue"><i data-lucide="package"></i></div>
+                        <i data-lucide="more-vertical" class="dim"></i>
                     </div>
+                    <div class="stat-value" id="total-assets">0</div>
+                    <div class="stat-label">전체 등록 자산</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-icon green"><i data-lucide="check-circle"></i></div>
-                    <div class="stat-info">
-                        <h3>정상 자산</h3>
-                        <p id="healthy-assets">0</p>
+                    <div class="stat-header">
+                        <div class="stat-icon green"><i data-lucide="shield-check"></i></div>
                     </div>
+                    <div class="stat-value" id="healthy-assets">0</div>
+                    <div class="stat-label">무결성 검증 통과</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-icon red"><i data-lucide="alert-triangle"></i></div>
-                    <div class="stat-info">
-                        <h3>무결성 위반</h3>
-                        <p id="failed-scans" class="text-error">0</p>
+                    <div class="stat-header">
+                        <div class="stat-icon red"><i data-lucide="shield-alert"></i></div>
                     </div>
+                    <div class="stat-value text-error" id="failed-scans">0</div>
+                    <div class="stat-label">미인가 변조 감지</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-icon purple"><i data-lucide="activity"></i></div>
-                    <div class="stat-info">
-                        <h3>누적 스캔</h3>
-                        <p id="total-scans">0</p>
+                    <div class="stat-header">
+                        <div class="stat-icon orange"><i data-lucide="zap"></i></div>
                     </div>
+                    <div class="stat-value" id="total-scans">0</div>
+                    <div class="stat-label">누적 관제 횟수</div>
                 </div>
             </div>
 
-            <!-- Main Sections -->
             <div class="dashboard-grid">
-                <!-- Recent Assets -->
-                <section class="section">
-                    <div class="section-header">
-                        <h2>자산 무결성 현황 (Baselines)</h2>
+                <!-- Assets Table -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>실시간 자산 리스트 (최근 15개)</h3>
+                        <div class="search-box">
+                            <!-- Future enhancement -->
+                        </div>
                     </div>
-                    <div class="table-wrapper">
+                    <div class="table-container">
                         <table id="assets-table">
                             <thead>
                                 <tr>
-                                    <th>자산명</th>
-                                    <th>실행 경로</th>
-                                    <th>상태</th>
-                                    <th>최종 스캔</th>
+                                    <th>자산/노드 정보</th>
+                                    <th>무결성 상태</th>
+                                    <th>최종 스캔 일시</th>
+                                    <th>액션</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <!-- Data will be loaded via JS -->
+                                <!-- JS content -->
                             </tbody>
                         </table>
                     </div>
-                </section>
+                </div>
 
-                <!-- Audit Logs -->
-                <section class="section">
-                    <div class="section-header">
-                        <h2>최근 감사 로그 (Audit Logs)</h2>
+                <!-- Right Column: Chart & Logs -->
+                <div class="side-col">
+                    <div class="card" style="margin-bottom: 1.5rem;">
+                        <div class="card-header">
+                            <h3>무결성 분포도</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="integrityChart"></canvas>
+                        </div>
                     </div>
-                    <div class="log-container" id="logs-container">
-                        <!-- Data will be loaded via JS -->
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>최근 보안 이벤트 감사 로그</h3>
+                        </div>
+                        <div class="log-list" id="log-list">
+                            <!-- JS content -->
+                        </div>
                     </div>
-                </section>
+                </div>
             </div>
         </main>
     </div>
 
-    <!-- UI Logic -->
     <script>
-        // Init Lucide Icons
         lucide.createIcons();
+        
+        let integrityChart;
 
-        async function fetchDashboardData() {
+        async function updateDashboard() {
             try {
-                // Fetch stats from backend (I need to add this endpoint)
-                const baselinesRes = await fetch('/baselines/');
-                const baselines = await baselinesRes.json();
+                // Fetch Stats
+                const statsRes = await fetch('/api/stats');
+                const stats = await statsRes.json();
                 
-                const scansRes = await fetch('/scans/?limit=50');
-                const scans = await scansRes.json();
+                document.getElementById('total-assets').innerText = stats.total_assets.toLocaleString();
+                document.getElementById('healthy-assets').innerText = stats.healthy_assets.toLocaleString();
+                document.getElementById('failed-scans').innerText = stats.failed_scans_count.toLocaleString();
+                document.getElementById('total-scans').innerText = stats.total_scans.toLocaleString();
 
-                // Update Stats
-                document.getElementById('total-baselines').innerText = baselines.length;
-                document.getElementById('total-scans').innerText = '10,000+'; // Static for demo as we have 10k mock data
-                
-                // Asset Table
+                // Update Chart
+                updateChart(stats.healthy_assets, stats.total_assets - stats.healthy_assets);
+
+                // Fetch Assets
+                const assetsRes = await fetch('/api/baselines?limit=15');
+                const assets = await assetsRes.json();
                 const tbody = document.querySelector('#assets-table tbody');
                 tbody.innerHTML = '';
-                baselines.slice(0, 10).forEach(b => {
-                    const statusClass = b.is_consistent === false ? 'status-fail' : 'status-pass';
-                    const statusText = b.is_consistent === false ? 'UNSAFE' : 'SAFE';
+                
+                assets.sort((a,b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, 15).forEach(asset => {
                     const tr = document.createElement('tr');
+                    const statusClass = asset.is_consistent ? 'badge-success' : 'badge-danger';
+                    const statusText = asset.is_consistent ? 'SECURE' : 'COMPROMISED';
+                    
                     tr.innerHTML = `
-                        <td class="bold">${b.name}</td>
-                        <td class="dim">${b.path}</td>
-                        <td><span class="status-tag ${statusClass}">${statusText}</span></td>
-                        <td>${new Date(b.last_scanned_at).toLocaleString()}</td>
+                        <td>
+                            <div class="asset-name">
+                                <span>${asset.name}</span>
+                                <span>${asset.path}</span>
+                            </div>
+                        </td>
+                        <td><span class="badge ${statusClass}">${statusText}</span></td>
+                        <td>${asset.last_scanned_at ? new Date(asset.last_scanned_at).toLocaleString() : '-'}</td>
+                        <td>
+                            <button class="btn btn-sm" onclick="scanAsset(${asset.id})"><i data-lucide="play" style="width:14px"></i></button>
+                        </td>
                     `;
                     tbody.appendChild(tr);
                 });
 
-                // Logs Container
-                const logCont = document.getElementById('logs-container');
-                logCont.innerHTML = '';
-                scans.slice(0, 15).forEach(s => {
-                    const isFail = !s.is_consistent;
+                // Fetch Logs
+                const scansRes = await fetch('/api/scans?limit=10');
+                const scans = await scansRes.json();
+                const logList = document.getElementById('log-list');
+                logList.innerHTML = '';
+                
+                scans.forEach(scan => {
                     const logItem = document.createElement('div');
-                    logItem.className = `log-item ${isFail ? 'fail' : 'pass'}`;
+                    logItem.className = `log-item ${scan.is_consistent ? 'success' : 'error'}`;
                     logItem.innerHTML = `
-                        <div class="log-meta">${new Date(s.scanned_at).toLocaleTimeString()}</div>
-                        <div class="log-content">
-                            <strong>${isFail ? '[ALERT]' : '[INFO]'}</strong> ${s.details}
-                            <span class="path">${s.scanned_path}</span>
-                        </div>
+                        <div class="log-time">${new Date(scan.scanned_at).toLocaleTimeString()}</div>
+                        <div class="log-msg">${scan.details}</div>
                     `;
-                    logCont.appendChild(logItem);
+                    logList.appendChild(logItem);
                 });
 
-                // Mock failed scans count (for demo feel)
-                document.getElementById('failed-scans').innerText = '321';
-                document.getElementById('healthy-assets').innerText = '968';
-
+                lucide.createIcons();
             } catch (err) {
-                console.error('Error loading data:', err);
+                console.error('Fetch error:', err);
             }
         }
 
-        fetchDashboardData();
-        setInterval(fetchDashboardData, 30000); // 30s auto-refresh
+        function updateChart(healthy, compromised) {
+            const ctx = document.getElementById('integrityChart').getContext('2d');
+            
+            if (integrityChart) {
+                integrityChart.data.datasets[0].data = [healthy, compromised];
+                integrityChart.update();
+                return;
+            }
+
+            integrityChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['정상', '위반'],
+                    datasets: [{
+                        data: [healthy, compromised],
+                        backgroundColor: ['#10b981', '#ef4444'],
+                        borderWidth: 0,
+                        hoverOffset: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { color: '#94a3b8', padding: 20 }
+                        }
+                    },
+                    cutout: '70%'
+                }
+            });
+        }
+
+        async function scanAsset(id) {
+            await fetch(`/api/baselines/${id}/scan`, { method: 'POST' });
+            updateDashboard();
+        }
+
+        async function triggerScanAll() {
+            await fetch('/api/scan-all', { method: 'POST' });
+            alert('전체 자산 스캔이 예약되었습니다.');
+            setTimeout(updateDashboard, 2000);
+        }
+
+        // Initial load
+        updateDashboard();
+        setInterval(updateDashboard, 5000);
     </script>
 </body>
 </html>

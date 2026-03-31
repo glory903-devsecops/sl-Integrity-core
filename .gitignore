@@ -3,4 +3,5 @@ __pycache__/
 *.pyc
 .DS_Store
 factory_integrity.db
+*.db-journal
 .env
