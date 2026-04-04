@@ -13,6 +13,7 @@ function App() {
   const [assets, setAssets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [scanning, setScanning] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -48,24 +49,40 @@ function App() {
   };
 
   return (
-    <div className="flex min-h-screen bg-sl-bg text-sl-text">
-      <Sidebar />
+    <div className="flex min-h-screen bg-sl-bg text-sl-text relative overflow-x-hidden">
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
       
-      <main className="flex-1 p-8 overflow-y-auto">
-        <header className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-satoshi font-bold tracking-tight text-white mb-2">
-              Factory Integrity Monitoring
-            </h1>
+      {/* Mobile Overlay */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+      
+      <main className="flex-1 p-4 md:p-8 overflow-y-auto">
+        <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+          <div className="flex items-center gap-4 w-full md:w-auto">
+            <button 
+              onClick={() => setIsSidebarOpen(true)}
+              className="lg:hidden p-2 hover:bg-white/5 rounded-lg text-sl-accent"
+            >
+              <Activity size={24} />
+            </button>
+            <div>
+              <h1 className="text-2xl md:text-3xl font-satoshi font-bold tracking-tight text-white mb-1 md:mb-2">
+                Factory Integrity Monitoring
+              </h1>
             <p className="text-sl-muted">
               에스엘(SL) 스마트 제조 공장 자산 무결성 실시간 관제 시스템
             </p>
+            </div>
           </div>
           
           <button 
             onClick={handleScanAll}
             disabled={scanning}
-            className="flex items-center gap-2 bg-sl-accent hover:bg-amber-600 px-6 py-2.5 rounded-lg font-semibold transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-amber-500/20 text-zinc-900"
+            className="w-full md:w-auto flex items-center justify-center gap-2 bg-sl-accent hover:bg-amber-600 px-6 py-2.5 rounded-lg font-semibold transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-amber-500/20 text-zinc-900"
           >
             <RefreshCw size={20} className={scanning ? "animate-spin" : ""} />
             {scanning ? "검사 중..." : "전체 무결성 검사 실행"}
@@ -73,7 +90,7 @@ function App() {
         </header>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
           <StatCard 
             title="총 관리 자산" 
             value={stats.total_assets} 
