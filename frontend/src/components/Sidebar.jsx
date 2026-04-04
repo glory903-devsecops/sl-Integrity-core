@@ -1,6 +1,14 @@
-import { Shield, LayoutDashboard, Database, Settings, HelpCircle, LogOut, X } from 'lucide-react';
+import React from 'react';
+import { NavLink } from 'react-router-dom';
+import { Shield, LayoutDashboard, Database, Settings, HelpCircle, LogOut, X, Package, Activity } from 'lucide-react';
 
 const Sidebar = ({ isOpen, onClose }) => {
+  const menuItems = [
+    { icon: <LayoutDashboard size={20} />, label: '통합 관제 대시보드', path: '/' },
+    { icon: <Package size={20} />, label: 'ERP 자산 등록', path: '/erp' },
+    { icon: <Activity size={20} />, label: '엔진 및 규칙 관리', path: '/engine' },
+  ];
+
   return (
     <aside className={`fixed lg:sticky top-0 left-0 z-50 w-64 md:w-72 max-w-[80vw] bg-[#0C0C0C] border-r border-sl-border flex flex-col p-6 h-screen transition-transform duration-300 ease-in-out ${
       isOpen ? 'translate-x-0 shadow-2xl shadow-black' : '-translate-x-full lg:translate-x-0'
@@ -21,28 +29,40 @@ const Sidebar = ({ isOpen, onClose }) => {
       </div>
 
       <nav className="flex-1 space-y-2">
-        <NavItem icon={<LayoutDashboard size={20} />} label="대시보드" active />
-        <NavItem icon={<Database size={20} />} label="자산 관리" />
-        <NavItem icon={<Settings size={20} />} label="시스템 설정" />
+        <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-4 px-2">Main Navigation</p>
+        {menuItems.map((item) => (
+          <NavLink
+            key={item.path}
+            to={item.path}
+            onClick={() => {
+              if (window.innerWidth < 1024) onClose();
+            }}
+            className={({ isActive }) => `
+              flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-300 font-medium group
+              ${isActive 
+                ? 'bg-sl-accent text-zinc-900 shadow-lg shadow-amber-500/20' 
+                : 'text-sl-muted hover:bg-white/5 hover:text-white'
+              }
+            `}
+          >
+            <span className="shrink-0">{item.icon}</span>
+            <span className="text-sm">{item.label}</span>
+          </NavLink>
+        ))}
       </nav>
 
-      <div className="mt-auto pt-6 border-t border-white/5 space-y-2">
-        <NavItem icon={<HelpCircle size={20} />} label="도움말" />
-        <NavItem icon={<LogOut size={20} />} label="로그아웃" />
+      <div className="mt-auto space-y-2 pt-6 border-t border-white/5">
+        <button className="flex items-center gap-3 px-3 py-3 rounded-xl text-sl-muted hover:bg-white/5 hover:text-white w-full transition-all text-sm font-medium">
+          <Settings size={20} />
+          <span>환경 설정</span>
+        </button>
+        <button className="flex items-center gap-3 px-3 py-3 rounded-xl text-red-400 hover:bg-red-500/10 w-full transition-all text-sm font-medium">
+          <LogOut size={20} />
+          <span>시스템 로그아웃</span>
+        </button>
       </div>
     </aside>
   );
 };
-
-const NavItem = ({ icon, label, active = false }) => (
-  <button className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-    active 
-      ? 'bg-amber-500/10 text-sl-accent border border-amber-500/20' 
-      : 'text-sl-muted hover:bg-white/5 hover:text-white'
-  }`}>
-    {icon}
-    <span className="font-medium">{label}</span>
-  </button>
-);
 
 export default Sidebar;
