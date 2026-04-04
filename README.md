@@ -48,30 +48,25 @@
 ```
 브라우저에서 `http://localhost:5173`에 접속하여 프리미엄 대시보드를 로컬에서 바로 확인하실 수 있습니다.
 
-## 🌟 Key Technical Values (기술적 차별점)
+## 🏛️ System Architecture
 
-### 1. Clean Architecture & SOLID Design
-단순한 스크립트 형태를 벗어나, 유지보수와 확장이 용이한 **Clean Architecture** 구조로 설계되었습니다.
-- **Domain Layer**: 비즈니스 규칙을 순수 파이썬 엔티티로 정의하여 외부 프레임워크와의 의존성을 분리했습니다.
-- **Use Case Layer**: 무결성 검사 로직을 독립적인 유스케이스로 구현하여 테스트 용이성을 극대화했습니다.
-- **Infrastructure Layer**: SQLAlchemy를 통한 Repository 패턴 적용으로 SQLite부터 Oracle DB까지 유연한 데이터 계층 전환이 가능합니다.
+The project follows a strict **Clean Architecture** and **SOLID** implementation:
 
-### 2. High-Performance Scaling (3,000+ Assets)
-제조 현장의 대규모 자산을 수용하기 위해 최적화된 비동기(Asynchronous) 스캔 로직을 구현했습니다.
-- **Batch Processing**: 2,000개 이상의 자산 등록 및 동시 무결성 검증 시에도 안정적인 성능을 유지함을 검증 완료했습니다.
-- **Efficient Hashing**: `dirhash` 라이브러리를 활용한 디렉토리 단위 해싱으로 검사 속도와 정확도를 동시에 확보했습니다.
+- **Domain Layer**: Pure business entities and protocols (Hashing, Repository).
+- **Application Layer**: Orchestrates business logic as independent Use Cases.
+- **Infrastructure Layer**: Concrete implementations for persistence (SQLAlchemy) and hashing (DirHash).
+- **Presentation Layer**: FastAPI API with advanced Dependency Injection (DI) to resolve services at runtime.
 
-### 3. Professional UI/UX (React + Tailwind CSS)
-제조 현장의 관리자가 한눈에 시스템 상태를 파악할 수 있도록 데이터 시각화 중심의 대시보드를 제공합니다.
-- **Real-time Status**: Chart.js를 이용한 시스템 건강도 시각화 및 실시간 상태 업데이트.
-- **Modern Tech Stack**: Vite + React 18 + Tailwind CSS 기반의 고성능 SPA(Single Page Application).
-- **Enterprise Aesthetic**: SL Corp의 브랜드 아이덴티티와 어울리는 Deep Navy 톤의 프리미엄 다크 모드 UI.
+---
 
-## 🛠 Tech Stack
+## 🛠️ Tech Stack
 - **Backend**: Python 3.10+, FastAPI, SQLAlchemy, Pydantic v2
-- **Frontend**: React, Tailwind CSS, Lucide Icons, Chart.js
-- **Database**: SQLite (Development) / Scalable to Enterprise DB
-- **Tools**: Pytest, Vite
+- **Frontend**: React 18, Vite 8, Tailwind CSS 3 (Industrial/Utilitarian Design)
+- **Security Logic**: SHA-256 Directory Hashing Engine
+- **Infrastructure**: SQLite (Development) / Scalable to Enterprise DB
+- **Deployment**: GitHub Pages (Frontend), GitHub Actions (CI/CD)
+
+---
 
 ## 📊 Verification
 - **Unit Tests**: 핵심 유스케이스 및 해싱 로직에 대한 100% 테스트 통과.

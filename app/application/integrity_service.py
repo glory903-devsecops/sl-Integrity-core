@@ -1,24 +1,9 @@
-from typing import List, Protocol, Optional
+from typing import List, Optional
 from datetime import datetime
 from ..domain.entities import Asset, ScanResult, DashboardStats
+from ..domain.interfaces import AssetRepositoryInterface, HashingServiceInterface
 
-class HashingServiceInterface(Protocol):
-    def calculate_hash(self, path: str) -> str:
-        ...
-
-class AssetRepositoryInterface(Protocol):
-    def get_all_assets(self) -> List[Asset]:
-        ...
-    def get_asset_by_id(self, asset_id: int) -> Optional[Asset]:
-        ...
-    def update_asset(self, asset: Asset) -> None:
-        ...
-    def save_scan_result(self, result: ScanResult) -> None:
-        ...
-    def get_stats(self) -> DashboardStats:
-        ...
-
-class IntegrityUseCase:
+class IntegrityService:
     def __init__(self, repo: AssetRepositoryInterface, hasher: HashingServiceInterface):
         self.repo = repo
         self.hasher = hasher
@@ -55,7 +40,3 @@ class IntegrityUseCase:
 
     def get_all_assets(self) -> List[Asset]:
         return self.repo.get_all_assets()
-
-# Helper for tests or legacy compatibility if needed
-def check_asset_integrity(use_case: IntegrityUseCase, asset_id: int) -> ScanResult:
-    return use_case.execute_scan(asset_id)

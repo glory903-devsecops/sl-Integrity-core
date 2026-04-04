@@ -1,9 +1,10 @@
 from typing import List, Optional
 from sqlalchemy.orm import Session
-from . import models
-from ..domain.entities import Asset, ScanResult, DashboardStats
+from ...db import models
+from ...domain.entities import Asset, ScanResult, DashboardStats
+from ...domain.interfaces import AssetRepositoryInterface
 
-class SQLAlchemyAssetRepository:
+class SQLAlchemyAssetRepository(AssetRepositoryInterface):
     def __init__(self, db: Session):
         self.db = db
 
@@ -30,8 +31,7 @@ class SQLAlchemyAssetRepository:
             scanned_path=result.scanned_path,
             scanned_hash=result.scanned_hash,
             is_consistent=result.is_consistent,
-            details=result.details,
-            scan_time=result.scan_time
+            details=result.details
         )
         self.db.add(db_result)
         self.db.commit()
