@@ -54,7 +54,7 @@ function App() {
       <main className="flex-1 p-8 overflow-y-auto">
         <header className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-white mb-2">
+            <h1 className="text-3xl font-satoshi font-bold tracking-tight text-white mb-2">
               Factory Integrity Monitoring
             </h1>
             <p className="text-sl-muted">
@@ -65,7 +65,7 @@ function App() {
           <button 
             onClick={handleScanAll}
             disabled={scanning}
-            className="flex items-center gap-2 bg-sl-accent hover:bg-blue-600 px-6 py-2.5 rounded-xl font-semibold transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-blue-500/20"
+            className="flex items-center gap-2 bg-sl-accent hover:bg-amber-600 px-6 py-2.5 rounded-lg font-semibold transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-amber-500/20 text-zinc-900"
           >
             <RefreshCw size={20} className={scanning ? "animate-spin" : ""} />
             {scanning ? "검사 중..." : "전체 무결성 검사 실행"}
@@ -113,8 +113,8 @@ function App() {
               <IntegrityChart stats={stats} />
             </div>
             
-            <div className="glass-panel p-6 bg-gradient-to-br from-blue-900/20 to-transparent">
-              <h3 className="font-bold mb-2">Security Notice</h3>
+            <div className="glass-panel p-6 border-l-4 border-l-sl-accent">
+              <h3 className="font-bold font-satoshi mb-2">Security Notice</h3>
               <p className="text-sm text-sl-muted leading-relaxed">
                 현재 모든 자산의 무결성이 해시 알고리즘(MD5/SHA256)을 통해 실시간으로 보호되고 있습니다. 
                 임의의 파일 변경이 감지될 경우 즉시 경보가 발생합니다.

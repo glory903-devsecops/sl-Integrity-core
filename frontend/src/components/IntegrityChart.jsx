@@ -35,7 +35,7 @@ const IntegrityChart = ({ stats }) => {
   return (
     <div className="relative h-64 w-64 mx-auto flex items-center justify-center">
       <div className="absolute text-center">
-        <p className="text-3xl font-bold text-white">
+        <p className="text-3xl font-jetbrains font-bold text-white">
           {Math.round((stats.healthy_assets / stats.total_assets) * 100) || 0}%
         </p>
         <p className="text-[10px] uppercase text-sl-muted tracking-widest">Integrity Index</p>

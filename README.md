@@ -1,6 +1,6 @@
 # SL-Integrity-Core (무결성 핵심 관제 시스템)
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-Launch%20Dashboard-0F172A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://glory903-devsecops.github.io/sl-Integrity-core)
+<a href="https://glory903-devsecops.github.io/sl-Integrity-core" target="_blank"><img src="https://img.shields.io/badge/Live%20Demo-Launch%20Dashboard-0F172A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="Live Demo"></a>
 <br/>
 <br/>
 

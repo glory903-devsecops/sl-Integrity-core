@@ -8,17 +8,19 @@ export default {
     extend: {
       colors: {
         sl: {
-          bg: '#0F172A', // Deep Navy
-          card: 'rgba(30, 41, 59, 0.7)', // Slate 800 with glass opacity
-          accent: '#3B82F6', // Blue 500
-          text: '#F8FAFC', // Slate 50
-          muted: '#94A3B8', // Slate 400
-          border: 'rgba(255, 255, 255, 0.1)',
+          bg: '#0C0C0C', // Base dark
+          card: '#141414', // Surface dark
+          accent: '#F59E0B', // amber-500
+          text: '#FAFAFA', // zinc-50
+          muted: '#A1A1AA', // zinc-400
+          border: '#262626', // zinc-800
         }
       },
-      backdropBlur: {
-        xs: '2px',
-      }
+      fontFamily: {
+        sans: ['DM Sans', 'sans-serif'],
+        satoshi: ['Satoshi', 'sans-serif'],
+        jetbrains: ['JetBrains Mono', 'monospace'],
+      },
     },
   },
   plugins: [],

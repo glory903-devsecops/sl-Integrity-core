@@ -8,7 +8,7 @@ const Sidebar = () => {
         <div className="bg-sl-accent p-2 rounded-lg">
           <Shield className="text-white" size={24} />
         </div>
-        <span className="text-xl font-bold tracking-tight text-white">IntegrityCore</span>
+        <span className="text-xl font-satoshi font-bold tracking-tight text-white">IntegrityCore</span>
       </div>
 
       <nav className="flex-1 space-y-2">
@@ -28,7 +28,7 @@ const Sidebar = () => {
 const NavItem = ({ icon, label, active = false }) => (
   <button className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
     active 
-      ? 'bg-blue-500/10 text-sl-accent border border-blue-500/20' 
+      ? 'bg-amber-500/10 text-sl-accent border border-amber-500/20' 
       : 'text-sl-muted hover:bg-white/5 hover:text-white'
   }`}>
     {icon}

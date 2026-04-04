@@ -30,7 +30,7 @@ const AssetTable = ({ assets, onRefresh }) => {
           {assets.map((asset) => (
             <tr key={asset.id} className="bg-white/5 hover:bg-white/10 transition-colors group">
               <td className="px-4 py-4 rounded-l-xl font-medium">{asset.name}</td>
-              <td className="px-4 py-4 text-sl-muted text-sm font-mono truncate max-w-[200px]">
+              <td className="px-4 py-4 text-sl-muted text-sm font-jetbrains truncate max-w-[200px]">
                 {asset.path}
               </td>
               <td className="px-4 py-4">
