@@ -2,12 +2,30 @@ import React, { useState } from 'react';
 import { Package, Plus, Search, Filter, Save, ArrowRight, Activity } from 'lucide-react';
 
 const ERPPage = ({ onOpenSidebar }) => {
+  const PRESETS = [
+    { name: 'PLC Logic Backend', path: '/opt/sl/smart_factory/plc_control/logic_v2', dept: 'Smart Factory A' },
+    { name: 'MES Database Config', path: 'C:\\ProgramData\\SL_Corp\\MES\\config\\db.config', dept: 'Quality Control B' },
+    { name: 'R&D Firmware V3', path: '/opt/sl/rnd/firmware/stable/bin', dept: 'R&D Center' },
+    { name: 'Inventory XML API', path: 'C:\\Users\\Admin\\Documents\\SL\\API\\Inventory.xml', dept: 'Smart Factory A' },
+  ];
+
   const [formData, setFormData] = useState({
     name: '',
     path: '',
     description: '',
     department: 'Smart Factory A'
   });
+  const [showPresets, setShowPresets] = useState(false);
+
+  const handlePresetSelect = (preset) => {
+    setFormData({
+      ...formData,
+      name: preset.name,
+      path: preset.path,
+      department: preset.dept
+    });
+    setShowPresets(false);
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -57,16 +75,54 @@ const ERPPage = ({ onOpenSidebar }) => {
               />
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-2 relative">
               <label className="text-xs font-bold text-sl-muted uppercase tracking-widest px-1">대상 경로 (Absolute Path)</label>
-              <input 
-                type="text" 
-                required 
-                value={formData.path}
-                onChange={(e) => setFormData({...formData, path: e.target.value})}
-                placeholder="/opt/sl/smart_factory/control_code" 
-                className="w-full bg-black/40 border border-zinc-800 focus:border-sl-accent/50 p-3 rounded-lg text-white font-jetbrains outline-none transition-all"
-              />
+              <div className="flex gap-2">
+                <input 
+                  type="text" 
+                  required 
+                  value={formData.path}
+                  onChange={(e) => setFormData({...formData, path: e.target.value})}
+                  placeholder="/opt/sl/smart_factory/control_code" 
+                  className="w-full bg-black/40 border border-zinc-800 focus:border-sl-accent/50 p-3 rounded-lg text-white font-jetbrains outline-none transition-all"
+                />
+                <button 
+                  type="button"
+                  onClick={() => setShowPresets(!showPresets)}
+                  className={`p-3 rounded-lg border transition-all ${showPresets ? 'bg-sl-accent border-sl-accent text-zinc-900' : 'bg-zinc-800 border-zinc-700 text-sl-accent hover:border-sl-accent/50'}`}
+                  title="Smart Browse Presets"
+                >
+                  <Search size={20} />
+                </button>
+              </div>
+              
+              {/* Presets Dropdown */}
+              {showPresets && (
+                <div className="absolute left-0 right-12 mt-2 bg-zinc-900 border border-zinc-700 rounded-xl shadow-2xl z-20 overflow-hidden animate-in zoom-in-95 duration-200">
+                  <div className="p-3 bg-zinc-800/50 border-b border-white/5">
+                    <p className="text-[10px] font-bold text-sl-muted uppercase tracking-widest flex items-center gap-2">
+                      <Activity size={12} className="text-sl-accent" /> Detected System Assets
+                    </p>
+                  </div>
+                  <div className="max-h-[240px] overflow-y-auto">
+                    {PRESETS.map((p, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => handlePresetSelect(p)}
+                        className="w-full text-left p-4 hover:bg-sl-accent/10 border-b border-white/5 last:border-0 transition-colors group"
+                      >
+                        <p className="text-sm font-bold text-white group-hover:text-sl-accent mb-0.5">{p.name}</p>
+                        <p className="text-[10px] text-sl-muted font-jetbrains truncate">{p.path}</p>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <p className="text-[10px] text-zinc-500 mt-2 italic px-1">
+                예시: Windows (C:\sl\mes\db), Linux (/opt/sl/firmware)
+              </p>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
