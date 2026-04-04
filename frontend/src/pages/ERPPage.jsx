@@ -1,30 +1,49 @@
 import React, { useState } from 'react';
-import { Package, Plus, Search, Filter, Save, ArrowRight, Activity } from 'lucide-react';
+import { Package, Plus, Search, Filter, Save, ArrowRight, Activity, HelpCircle, Folder, X } from 'lucide-react';
 
 const ERPPage = ({ onOpenSidebar }) => {
-  const PRESETS = [
-    { name: 'PLC Logic Backend', path: '/opt/sl/smart_factory/plc_control/logic_v2', dept: 'Smart Factory A' },
-    { name: 'MES Database Config', path: 'C:\\ProgramData\\SL_Corp\\MES\\config\\db.config', dept: 'Quality Control B' },
-    { name: 'R&D Firmware V3', path: '/opt/sl/rnd/firmware/stable/bin', dept: 'R&D Center' },
-    { name: 'Inventory XML API', path: 'C:\\Users\\Admin\\Documents\\SL\\API\\Inventory.xml', dept: 'Smart Factory A' },
-  ];
-
   const [formData, setFormData] = useState({
     name: '',
     path: '',
     description: '',
     department: 'Smart Factory A'
   });
-  const [showPresets, setShowPresets] = useState(false);
+  const [showExplorer, setShowExplorer] = useState(false);
+  const [currentDir, setCurrentDir] = useState(['Home']);
+  const [showHelp, setShowHelp] = useState(false);
 
-  const handlePresetSelect = (preset) => {
-    setFormData({
-      ...formData,
-      name: preset.name,
-      path: preset.path,
-      department: preset.dept
-    });
-    setShowPresets(false);
+  const MOCK_FS = {
+    'Home': ['opt', 'var', 'etc', 'usr', 'Users', 'ProgramData'],
+    'opt': ['sl', 'docker', 'bin'],
+    'sl': ['smart_factory', 'rnd', 'mes', 'edge_node'],
+    'smart_factory': ['plc_control', 'hmi_data', 'logs'],
+    'plc_control': ['logic_v2', 'firmware_stable', 'backup'],
+    'mes': ['config', 'db', 'scripts'],
+    'ProgramData': ['SL_Corp', 'Microsoft', 'NVIDIA'],
+    'SL_Corp': ['MES', 'QualityControl', 'Logistics'],
+    'MES': ['config', 'db.config', 'security_policy'],
+  };
+
+  const handleFolderClick = (folder) => {
+    if (MOCK_FS[folder]) {
+      setCurrentDir([...currentDir, folder]);
+    } else {
+      // It's a file or bottom-level folder
+      const fullPath = currentDir.join('/') + '/' + folder;
+      setFormData({ ...formData, path: fullPath.replace('Home/', '/') });
+    }
+  };
+
+  const goBack = () => {
+    if (currentDir.length > 1) {
+      setCurrentDir(currentDir.slice(0, -1));
+    }
+  };
+
+  const handleSelectPath = () => {
+    const fullPath = currentDir.join('/').replace('Home', '');
+    setFormData({ ...formData, path: fullPath || '/' });
+    setShowExplorer(false);
   };
 
   const handleSubmit = (e) => {
@@ -76,7 +95,29 @@ const ERPPage = ({ onOpenSidebar }) => {
             </div>
 
             <div className="space-y-2 relative">
-              <label className="text-xs font-bold text-sl-muted uppercase tracking-widest px-1">대상 경로 (Absolute Path)</label>
+              <div className="flex items-center justify-between px-1">
+                <label className="text-xs font-bold text-sl-muted uppercase tracking-widest">대상 경로 (Absolute Path)</label>
+                <button 
+                  type="button" 
+                  onMouseEnter={() => setShowHelp(true)}
+                  onMouseLeave={() => setShowHelp(false)}
+                  className="text-sl-accent/60 hover:text-sl-accent transition-colors"
+                >
+                  <HelpCircle size={14} />
+                </button>
+              </div>
+              
+              {/* Path Discovery Tooltip */}
+              {showHelp && (
+                <div className="absolute right-0 -top-24 w-64 bg-zinc-800 border border-sl-accent/30 p-3 rounded-lg shadow-2xl z-50 animate-in fade-in slide-in-from-bottom-2">
+                  <p className="text-[10px] font-bold text-sl-accent uppercase mb-1">How to find this path?</p>
+                  <p className="text-[10px] text-zinc-300 leading-relaxed">
+                    <span className="text-white font-bold">Linux:</span> 터미널에서 <code className="bg-black px-1 rounded">pwd</code> 명령어를 입력해 전체 경로를 복사하세요.<br/>
+                    <span className="text-white font-bold">Windows:</span> Explorer 주소창을 클릭하거나 폴더 우클릭 후 '경로로 복사'를 선택하세요.
+                  </p>
+                </div>
+              )}
+
               <div className="flex gap-2">
                 <input 
                   type="text" 
@@ -88,42 +129,87 @@ const ERPPage = ({ onOpenSidebar }) => {
                 />
                 <button 
                   type="button"
-                  onClick={() => setShowPresets(!showPresets)}
-                  className={`p-3 rounded-lg border transition-all ${showPresets ? 'bg-sl-accent border-sl-accent text-zinc-900' : 'bg-zinc-800 border-zinc-700 text-sl-accent hover:border-sl-accent/50'}`}
-                  title="Smart Browse Presets"
+                  onClick={() => setShowExplorer(true)}
+                  className="bg-zinc-800 border border-zinc-700 text-sl-accent p-3 rounded-lg hover:border-sl-accent/50 transition-all font-bold group"
+                  title="System Explorer"
                 >
-                  <Search size={20} />
+                  <Search size={20} className="group-hover:scale-110 transition-transform" />
                 </button>
               </div>
-              
-              {/* Presets Dropdown */}
-              {showPresets && (
-                <div className="absolute left-0 right-12 mt-2 bg-zinc-900 border border-zinc-700 rounded-xl shadow-2xl z-20 overflow-hidden animate-in zoom-in-95 duration-200">
-                  <div className="p-3 bg-zinc-800/50 border-b border-white/5">
-                    <p className="text-[10px] font-bold text-sl-muted uppercase tracking-widest flex items-center gap-2">
-                      <Activity size={12} className="text-sl-accent" /> Detected System Assets
-                    </p>
-                  </div>
-                  <div className="max-h-[240px] overflow-y-auto">
-                    {PRESETS.map((p, idx) => (
-                      <button
-                        key={idx}
-                        type="button"
-                        onClick={() => handlePresetSelect(p)}
-                        className="w-full text-left p-4 hover:bg-sl-accent/10 border-b border-white/5 last:border-0 transition-colors group"
-                      >
-                        <p className="text-sm font-bold text-white group-hover:text-sl-accent mb-0.5">{p.name}</p>
-                        <p className="text-[10px] text-sl-muted font-jetbrains truncate">{p.path}</p>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
               <p className="text-[10px] text-zinc-500 mt-2 italic px-1">
-                예시: Windows (C:\sl\mes\db), Linux (/opt/sl/firmware)
+                예시: C:\sl\mes\database, /opt/sl/firmware
               </p>
             </div>
+
+            {/* Simulated System Explorer Modal */}
+            {showExplorer && (
+              <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                <div className="absolute inset-0 bg-black/80 backdrop-blur-md" onClick={() => setShowExplorer(false)}></div>
+                <div className="relative w-full max-w-xl bg-zinc-900 border border-zinc-800 rounded-2xl shadow-3xl overflow-hidden animate-in zoom-in-95 duration-200">
+                  <div className="p-4 bg-zinc-800/50 flex justify-between items-center border-b border-white/5">
+                    <div className="flex items-center gap-3">
+                      <div className="bg-sl-accent/10 p-2 rounded-lg">
+                        <Search className="text-sl-accent" size={18} />
+                      </div>
+                      <div>
+                        <h2 className="text-sm font-bold text-white uppercase tracking-tight">System Path Explorer</h2>
+                        <div className="flex items-center gap-1 text-[10px] text-sl-muted font-jetbrains mt-0.5">
+                          {currentDir.map((dir, i) => (
+                            <React.Fragment key={i}>
+                              <span className="hover:text-sl-accent cursor-pointer" onClick={() => setCurrentDir(currentDir.slice(0, i + 1))}>{dir}</span>
+                              {i < currentDir.length - 1 && <span> / </span>}
+                            </React.Fragment>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                    <button onClick={() => setShowExplorer(false)} className="text-zinc-500 hover:text-white">
+                      <X size={20} />
+                    </button>
+                  </div>
+
+                  <div className="p-6 h-[300px] overflow-y-auto">
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                      {currentDir.length > 1 && (
+                        <button 
+                          onClick={goBack}
+                          className="flex items-center gap-3 p-3 bg-white/5 border border-white/5 rounded-xl hover:bg-white/10 transition-all text-left"
+                        >
+                          <ArrowRight className="text-zinc-500 rotate-180" size={18} />
+                          <span className="text-xs font-medium text-zinc-300">.. (상위 폴더)</span>
+                        </button>
+                      )}
+                      {(MOCK_FS[currentDir[currentDir.length - 1]] || []).map((item, idx) => (
+                        <button 
+                          key={idx}
+                          onClick={() => handleFolderClick(item)}
+                          className="flex items-center gap-3 p-3 bg-white/5 border border-white/5 rounded-xl hover:bg-sl-accent/10 hover:border-sl-accent/20 transition-all text-left group"
+                        >
+                          {MOCK_FS[item] ? (
+                            <Folder className="text-amber-500 group-hover:scale-110 transition-transform" size={18} fill="currentColor" fillOpacity={0.2} />
+                          ) : (
+                            <Activity className="text-sl-accent" size={18} />
+                          )}
+                          <span className="text-xs font-medium text-white group-hover:text-sl-accent transition-colors">{item}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="p-4 bg-zinc-950 border-t border-white/5 flex justify-between items-center">
+                    <div className="text-[10px] text-sl-muted font-jetbrains">
+                      Selection: <span className="text-sl-accent">{currentDir.join('/').replace('Home', '') || '/'}</span>
+                    </div>
+                    <button 
+                      onClick={handleSelectPath}
+                      className="bg-sl-accent hover:bg-amber-600 text-zinc-900 px-6 py-2 rounded-lg font-bold text-xs transition-all active:scale-95"
+                    >
+                      현재 경로 선택 완료
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">

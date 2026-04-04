@@ -50,7 +50,7 @@
 
 ## 🏛️ System Architecture
 
-The project follows a strict **Clean Architecture** and **SOLID** implementation:
+The project follows a strict **Clean Architecture** and **SOLID** implementation. Detailed technical standards for algorithms and detection logic can be found in the **[Technical Policies Document](docs/POLICIES.md)**.
 
 - **Domain Layer**: Pure business entities and protocols (Hashing, Repository).
 - **Application Layer**: Orchestrates business logic as independent Use Cases.
