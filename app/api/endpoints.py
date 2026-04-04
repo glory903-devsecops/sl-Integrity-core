@@ -30,6 +30,13 @@ def scan_asset(asset_id: int, service: IntegrityService = Depends(get_integrity_
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
 
+@router.post("/assets", response_model=Asset)
+def create_asset(asset: Asset, service: IntegrityService = Depends(get_integrity_service)):
+    try:
+        return service.register_new_asset(asset)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
 @router.post("/scan-all")
 def scan_all_assets(background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
     service = get_integrity_service(db)

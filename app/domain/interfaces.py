@@ -20,6 +20,9 @@ class AssetRepositoryInterface(Protocol):
     def save_scan_result(self, result: ScanResult) -> None:
         """Save a new scan result to history."""
         ...
+    def register_asset(self, asset: Asset) -> Asset:
+        """Register a new asset and return the persisted entity."""
+        ...
     def get_stats(self) -> DashboardStats:
         """Retrieve aggregated dashboard statistics."""
         ...

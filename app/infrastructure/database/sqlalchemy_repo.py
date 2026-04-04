@@ -36,6 +36,20 @@ class SQLAlchemyAssetRepository(AssetRepositoryInterface):
         self.db.add(db_result)
         self.db.commit()
 
+    def register_asset(self, asset: Asset) -> Asset:
+        db_asset = models.Baseline(
+            name=asset.name,
+            path=asset.path,
+            description=asset.description,
+            department=asset.department,
+            current_hash=asset.current_hash,
+            is_consistent=asset.is_consistent
+        )
+        self.db.add(db_asset)
+        self.db.commit()
+        self.db.refresh(db_asset)
+        return Asset.model_validate(db_asset)
+
     def get_stats(self) -> DashboardStats:
         total_assets = self.db.query(models.Baseline).count()
         healthy_assets = self.db.query(models.Baseline).filter(models.Baseline.is_consistent == True).count()

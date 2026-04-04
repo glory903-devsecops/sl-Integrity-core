@@ -6,6 +6,8 @@ class Asset(BaseModel):
     id: Optional[int] = None
     name: str
     path: str
+    description: Optional[str] = None
+    department: Optional[str] = None
     current_hash: Optional[str] = None
     last_scanned_at: Optional[datetime] = None
     is_consistent: bool = True

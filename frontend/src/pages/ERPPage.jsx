@@ -64,14 +64,29 @@ const ERPPage = ({ onOpenSidebar }) => {
     setShowExplorer(false);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("ERP Asset Registered:", formData);
-    alert("자산이 성공적으로 ERP 시스템에 등록되었습니다.");
-    // Reset wizard
-    setCurrentStep(1);
-    setFormData({ name: '', path: '', description: '', department: 'Smart Factory A' });
-    setSelectedTemplate(null);
+    try {
+      const response = await fetch("http://localhost:8000/api/assets", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData)
+      });
+      
+      if (!response.ok) throw new Error("Backend registration failed");
+      
+      const result = await response.json();
+      console.log("ERP Asset Registered:", result);
+      alert("✅ 자산이 성공적으로 ERP 시스템 및 무결성 엔진에 등록되었습니다.");
+      
+      // Reset wizard
+      setCurrentStep(1);
+      setFormData({ name: '', path: '', description: '', department: 'Smart Factory A' });
+      setSelectedTemplate(null);
+    } catch (error) {
+      console.error(error);
+      alert("❌ 자산 등록 중 오류가 발생했습니다. 백엔드 상태를 확인하세요.");
+    }
   };
 
   return (

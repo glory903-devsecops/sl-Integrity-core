@@ -40,3 +40,10 @@ class IntegrityService:
 
     def get_all_assets(self) -> List[Asset]:
         return self.repo.get_all_assets()
+
+    def register_new_asset(self, asset_data: Asset) -> Asset:
+        # Calculate initial hash for baseline
+        initial_hash = self.hasher.calculate_hash(asset_data.path)
+        asset_data.current_hash = initial_hash
+        asset_data.is_consistent = True
+        return self.repo.register_asset(asset_data)
