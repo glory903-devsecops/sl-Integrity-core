@@ -36,11 +36,24 @@ const DashboardPage = ({ onOpenSidebar }) => {
       console.error('Error fetching data:', error);
       // Fallback for demo
       setStats({
-        total_assets: 124,
-        healthy_assets: 122,
-        critical_issues: 2,
-        total_scans: 1542
+        total_assets: 327,
+        healthy_assets: 307,
+        critical_issues: 20,
+        total_scans: 5842
       });
+      // Realistic fallback assets for demo environments (e.g. GitHub Pages)
+      setAssets([
+        { id: 1001, name: "Siemens-S7-1500-001", path: "/opt/sf/nodes/ulsan/plc_logic/main_logic.bin", is_consistent: true, department: "PLC", last_scanned_at: new Date().toISOString() },
+        { id: 1002, name: "ABB-IRB-6700-042", path: "/opt/sf/nodes/ulsan/robotics/arm_control.exe", is_consistent: false, department: "Robot", last_scanned_at: new Date().toISOString() },
+        { id: 1003, name: "Mazak-Integrex-v2-015", path: "/opt/sf/nodes/changwon/cnc/tooling.cfg", is_consistent: true, department: "CNC", last_scanned_at: new Date().toISOString() },
+        { id: 1004, name: "Keyence-CV-X-088", path: "/opt/sf/nodes/gumi/vision/sensor_calib.dat", is_consistent: true, department: "Sensor", last_scanned_at: new Date().toISOString() },
+        { id: 1005, name: "Industrial PLC Logic", path: "/opt/sf/nodes/ulsan/plc_logic", is_consistent: false, department: "Smart Factory A", last_scanned_at: new Date().toISOString() },
+        { id: 1006, name: "Fanuc-R-2000iD-112", path: "/opt/sf/nodes/whasung/robotics/sequence.bin", is_consistent: true, department: "Robot", last_scanned_at: new Date().toISOString() },
+        { id: 1007, name: "DMG-Mori-CTX-003", path: "/opt/sf/nodes/changwon/cnc/spindle.cfg", is_consistent: true, department: "CNC", last_scanned_at: new Date().toISOString() },
+        { id: 1008, name: "Omron-ZW-7000-056", path: "/opt/sf/nodes/gumi/vision/depth_map.bin", is_consistent: true, department: "Sensor", last_scanned_at: new Date().toISOString() },
+        { id: 1009, name: "Daifuku-RGV-Mk3-009", path: "/opt/sf/nodes/ulsan/logistics/route.cfg", is_consistent: true, department: "Logistics", last_scanned_at: new Date().toISOString() },
+        { id: 1010, name: "HVAC-System-P1-001", path: "/opt/sf/nodes/pyeongtaek/infra/hvac_ctrl.log", is_consistent: true, department: "Infrastructure", last_scanned_at: new Date().toISOString() }
+      ]);
     } finally {
       setLoading(false);
     }

@@ -143,16 +143,16 @@
                 const statsRes = await fetch('/api/stats');
                 const stats = await statsRes.json();
                 
-                document.getElementById('total-assets').innerText = stats.total_assets.toLocaleString();
-                document.getElementById('healthy-assets').innerText = stats.healthy_assets.toLocaleString();
-                document.getElementById('failed-scans').innerText = stats.failed_scans_count.toLocaleString();
-                document.getElementById('total-scans').innerText = stats.total_scans.toLocaleString();
+                document.getElementById('total-assets').innerText = stats.total_assets?.toLocaleString() || 0;
+                document.getElementById('healthy-assets').innerText = stats.healthy_assets?.toLocaleString() || 0;
+                document.getElementById('failed-scans').innerText = stats.critical_issues?.toLocaleString() || 0;
+                document.getElementById('total-scans').innerText = stats.total_scans?.toLocaleString() || 0;
 
                 // Update Chart
                 updateChart(stats.healthy_assets, stats.total_assets - stats.healthy_assets);
 
                 // Fetch Assets
-                const assetsRes = await fetch('/api/baselines?limit=15');
+                const assetsRes = await fetch('/api/assets?limit=15');
                 const assets = await assetsRes.json();
                 const tbody = document.querySelector('#assets-table tbody');
                 tbody.innerHTML = '';
@@ -160,7 +160,7 @@
                 assets.sort((a,b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, 15).forEach(asset => {
                     const tr = document.createElement('tr');
                     const statusClass = asset.is_consistent ? 'badge-success' : 'badge-danger';
-                    const statusText = asset.is_consistent ? 'SECURE' : 'COMPROMISED';
+                    const statusText = asset.is_consistent ? '정상' : '변조됨';
                     
                     tr.innerHTML = `
                         <td>
@@ -202,15 +202,41 @@
 
         function updateChart(healthy, compromised) {
             const ctx = document.getElementById('integrityChart').getContext('2d');
+            const total = healthy + compromised;
+            const percentage = total > 0 ? Math.round((healthy / total) * 100) : 0;
             
             if (integrityChart) {
                 integrityChart.data.datasets[0].data = [healthy, compromised];
+                integrityChart.options.plugins.centerText.text = `${percentage}%`;
                 integrityChart.update();
                 return;
             }
 
+            // Custom plugin for center text
+            const centerTextPlugin = {
+                id: 'centerText',
+                beforeDraw: function(chart) {
+                    const width = chart.width,
+                        height = chart.height,
+                        ctx = chart.ctx;
+                    ctx.restore();
+                    const fontSize = (height / 114).toFixed(2);
+                    ctx.font = `bold ${fontSize}em Outfit`;
+                    ctx.textBaseline = "middle";
+                    ctx.fillStyle = percentage < 50 ? "#ef4444" : "#ffffff";
+
+                    const text = percentage + "%",
+                        textX = Math.round((width - ctx.measureText(text).width) / 2),
+                        textY = height / 2;
+
+                    ctx.fillText(text, textX, textY);
+                    ctx.save();
+                }
+            };
+
             integrityChart = new Chart(ctx, {
                 type: 'doughnut',
+                plugins: [centerTextPlugin],
                 data: {
                     labels: ['정상', '위반'],
                     datasets: [{
@@ -226,10 +252,11 @@
                     plugins: {
                         legend: {
                             position: 'bottom',
-                            labels: { color: '#94a3b8', padding: 20 }
-                        }
+                            labels: { color: '#94a3b8', padding: 15, font: { family: 'Noto Sans KR' } }
+                        },
+                        centerText: { text: `${percentage}%` }
                     },
-                    cutout: '70%'
+                    cutout: '80%'
                 }
             });
         }

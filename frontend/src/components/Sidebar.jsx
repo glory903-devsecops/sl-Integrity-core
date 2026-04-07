@@ -51,16 +51,7 @@ const Sidebar = ({ isOpen, onClose }) => {
         ))}
       </nav>
 
-      <div className="mt-auto space-y-2 pt-6 border-t border-white/5">
-        <button className="flex items-center gap-3 px-3 py-3 rounded-xl text-sl-muted hover:bg-white/5 hover:text-white w-full transition-all text-sm font-medium">
-          <Settings size={20} />
-          <span>환경 설정</span>
-        </button>
-        <button className="flex items-center gap-3 px-3 py-3 rounded-xl text-red-400 hover:bg-red-500/10 w-full transition-all text-sm font-medium">
-          <LogOut size={20} />
-          <span>시스템 로그아웃</span>
-        </button>
-      </div>
+
     </aside>
   );
 };
