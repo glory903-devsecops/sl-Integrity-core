@@ -22,14 +22,17 @@ class ScanResult(BaseModel):
     scanned_hash: str
     is_consistent: bool
     details: str
-    scan_time: datetime
+    scanned_at: datetime = Field(alias="scanned_at") # Match DB field name
 
     class Config:
         from_attributes = True
+        populate_by_name = True
 
 class DashboardStats(BaseModel):
     total_assets: int
     healthy_assets: int
     critical_issues: int
     total_scans: int
-    uptime: str = "99.9%"
+    uptime: str = "100.0%"
+    department_stats: dict = {} # Name -> {total, healthy}
+    recent_scans: List[ScanResult] = []

@@ -4,6 +4,8 @@ import axios from 'axios';
 import StatCard from '../components/StatCard';
 import AssetTable from '../components/AssetTable';
 import IntegrityChart from '../components/IntegrityChart';
+import DepartmentChart from '../components/DepartmentChart';
+import AuditLog from '../components/AuditLog';
 
 const API_BASE_URL = 'http://localhost:8000/api';
 
@@ -12,7 +14,9 @@ const DashboardPage = ({ onOpenSidebar }) => {
     total_assets: 0,
     healthy_assets: 0,
     critical_issues: 0,
-    total_scans: 0
+    total_scans: 0,
+    department_stats: {},
+    recent_scans: []
   });
   const [assets, setAssets] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -39,7 +43,17 @@ const DashboardPage = ({ onOpenSidebar }) => {
         total_assets: 327,
         healthy_assets: 307,
         critical_issues: 20,
-        total_scans: 5842
+        total_scans: 5842,
+        department_stats: {
+          "PLC": { "total": 120, "healthy": 115 },
+          "Robot": { "total": 85, "healthy": 78 },
+          "CNC": { "total": 62, "healthy": 58 },
+          "Sensor": { "total": 60, "healthy": 56 }
+        },
+        recent_scans: [
+          { id: 1, scanned_path: "/opt/sf/nodes/ulsan/plc_logic", is_consistent: false, scanned_at: new Date().toISOString(), details: "Unauthorized binary modification detected." },
+          { id: 2, scanned_path: "/opt/sf/nodes/gumi/vision/sensor_calib.dat", is_consistent: true, scanned_at: new Date().toISOString(), details: "Integrity check passed (SHA-256 matched)." }
+        ]
       });
       // Realistic fallback assets for demo environments (e.g. GitHub Pages)
       setAssets([
@@ -137,11 +151,31 @@ const DashboardPage = ({ onOpenSidebar }) => {
         </div>
 
         <div className="space-y-6">
-          <div className="flex items-center gap-2 mb-2">
-            <Activity className="text-sl-accent" size={20} />
-            <h2 className="text-xl font-bold text-white font-satoshi">시스템 건강도 (SDF 인덱스)</h2>
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 mb-2">
+              <Activity className="text-sl-accent" size={20} />
+              <h2 className="text-xl font-bold text-white font-satoshi">전체 무결성 지수</h2>
+            </div>
+            <IntegrityChart stats={stats} />
           </div>
-          <IntegrityChart stats={stats} />
+
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 mb-2">
+              <Shield className="text-sl-accent" size={20} />
+              <h2 className="text-sm font-bold text-white font-satoshi uppercase tracking-wider">부서별 보안 상태</h2>
+            </div>
+            <div className="glass-panel p-4 border-zinc-800">
+              <DepartmentChart deptStats={stats.department_stats} />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 mb-2">
+              <Activity className="text-sl-accent" size={20} />
+              <h2 className="text-sm font-bold text-white font-satoshi uppercase tracking-wider">실시간 보안 감사 (Audit)</h2>
+            </div>
+            <AuditLog scans={stats.recent_scans} />
+          </div>
           
           <div className="glass-panel p-6 border-zinc-800">
             <h3 className="text-sm font-bold text-white mb-4 uppercase tracking-widest">Security Notice</h3>

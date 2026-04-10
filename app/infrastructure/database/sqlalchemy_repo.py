@@ -56,9 +56,27 @@ class SQLAlchemyAssetRepository(AssetRepositoryInterface):
         critical_issues = self.db.query(models.Baseline).filter(models.Baseline.is_consistent == False).count()
         total_scans = self.db.query(models.ScanResult).count()
         
+        # Department stats
+        dept_stats = {}
+        distinct_depts = self.db.query(models.Baseline.department).distinct().all()
+        for (dept_name,) in distinct_depts:
+            if not dept_name: continue
+            dept_total = self.db.query(models.Baseline).filter(models.Baseline.department == dept_name).count()
+            dept_healthy = self.db.query(models.Baseline).filter(
+                models.Baseline.department == dept_name, 
+                models.Baseline.is_consistent == True
+            ).count()
+            dept_stats[dept_name] = {"total": dept_total, "healthy": dept_healthy}
+
+        # Recent scans (Audit Log)
+        recent_scans_db = self.db.query(models.ScanResult).order_by(models.ScanResult.scanned_at.desc()).limit(10).all()
+        recent_scans = [ScanResult.model_validate(obj) for obj in recent_scans_db]
+
         return DashboardStats(
             total_assets=total_assets,
             healthy_assets=healthy_assets,
             critical_issues=critical_issues,
-            total_scans=total_scans
+            total_scans=total_scans,
+            department_stats=dept_stats,
+            recent_scans=recent_scans
         )

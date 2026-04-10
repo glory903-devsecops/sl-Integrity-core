@@ -14,8 +14,9 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
-# Copy backend code and database
+# Copy backend code, scripts, and database
 COPY app/ ./app/
+COPY scripts/ ./scripts/
 COPY factory_integrity.db .
 
 # Set environment variable for relative imports

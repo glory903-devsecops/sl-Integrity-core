@@ -5,5 +5,5 @@ dirhash
 pydantic
 pydantic-settings
 python-multipart
+requests
 pytest
-# python-oracledb  # Oracle 연동이 필요할 때만 주석 해제 후 설치하세요.

@@ -82,7 +82,8 @@ docker compose up -d --build
 
 ## 📈 프로젝트 성과 및 증명 (Achievements)
 - **탐지 정확도**: 30개 시뮬레이션 시나리오 중 29개 실시간 탐지 성공 (**96.7%**).
-- **확장성**: 300+ 노드 환경에서 데이터 처리 및 UI 반응성 성능 최적화.
+- **Industrial Scale**: 315+ 노드 환경에서 데이터 처리 및 UI 반응성 성능 최적화.
+- **Advanced Analytics**: 부서별 보안 통계 차트 및 실시간 감사 로그(Audit Log) 기능 탑재.
 - **데브섹옵스**: CI/CD 파이프라인 및 자동화된 보안 테스트 스위트(`industrial_tamper_suite.py`) 구축.
 
 ---
