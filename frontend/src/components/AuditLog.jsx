@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckCircle2, AlertCircle, Clock } from 'lucide-react';
+import { CheckCircle2, AlertCircle, Clock, MapPin } from 'lucide-react';
 
 const AuditLog = ({ scans, onAssetClick }) => {
   return (
