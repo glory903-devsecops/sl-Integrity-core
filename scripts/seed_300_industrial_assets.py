@@ -5,12 +5,13 @@ import random
 
 BASE_URL = "http://localhost:8000/api"
 
-def register_asset(name, path, description, department):
+def register_asset(name, path, description, department, location):
     data = {
         "name": name,
         "path": path,
         "description": description,
         "department": department,
+        "location": location,
         "is_consistent": True
     }
     req = urllib.request.Request(
@@ -38,18 +39,16 @@ def trigger_scan_all():
 def main():
     print("🏭 Seeding 300 Industrial Assets into sl-Integrity-Core...")
     
-    # Realistic industrial asset categories
+    # Standardized Industrial Asset Categories for SL-Integrity-Core
     categories = {
-        "PLC": ["Siemens-S7-1500", "Mitsubishi-MELSEC", "LS-XGT", "Rockwell-Logix5000"],
-        "Robot": ["ABB-IRB-6700", "Fanuc-R-2000iD", "Kuka-KR-QUANTEC", "Yaskawa-Motoman"],
-        "Sensor": ["Keyence-CV-X", "Omron-ZW-7000", "Sick-NAV350", "Cognex-In-Sight"],
-        "CNC": ["Mazak-Integrex-v2", "DMG-Mori-CTX", "Doosan-Lynx", "Hyundai-Wia-KF"],
-        "Logistics": ["Daifuku-RGV-Mk3", "AutoStore-R5-Bot", "AGV-AMR-600", "Conveyor-Drive-C"],
-        "Infrastructure": ["HVAC-System-P1", "Transformer-Node-B", "Power-Analyzer-Q", "UPS-Manager-Server"]
+        "PLC 로직 컨트롤러": ["Siemens-S7-1500", "Mitsubishi-MELSEC", "LS-XGT", "Rockwell-Logix5000"],
+        "MES 서버 설정": ["Manufacturing-Ex-Server", "Process-Control-Node", "Inventory-Sync-Srv", "Quality-Assurance-Module"],
+        "R&D 설계 보안": ["Design-Workstation-X", "Core-Source-Vault", "Blueprint-Server-01", "Patent-Research-Node"],
+        "백업 데이터베이스": ["Daily-Process-Backup", "Archive-Vault-Gumi", "Disaster-Recovery-DB", "Weekly-Log-Storage"]
     }
     
     locations = ["Ulsan-Main-Plant-A", "Gumi-Electronic-B", "Pyeongtaek-Semicon-1", "Changwon-Machine-C", "Whasung-Automotive-D"]
-    line_names = ["Assembly-Line-1", "Paint-Line-2", "Foundry-Line-Alpha", "Testing-Lab-7", "Warehouse-Zone-B"]
+    line_names = ["Line-01-Logic", "Server-Room-B", "RD-Lab-Alpha", "Storage-Zone-Z"]
 
     start_time = time.time()
     
@@ -64,7 +63,7 @@ def main():
         path = f"/opt/sf/nodes/{location.lower()}/{line.lower()}/{name.lower()}"
         description = f"Industrial {cat_key} device located at {location} - {line}. Standard integrity monitoring enabled."
         
-        register_asset(name, path, description, cat_key)
+        register_asset(name, path, description, cat_key, location)
         if i % 50 == 0:
             print(f"✅ Registered {i}/{total_to_register} assets...")
             

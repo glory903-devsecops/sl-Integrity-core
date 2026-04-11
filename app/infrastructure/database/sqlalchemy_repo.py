@@ -42,6 +42,7 @@ class SQLAlchemyAssetRepository(AssetRepositoryInterface):
             path=asset.path,
             description=asset.description,
             department=asset.department,
+            location=asset.location,
             current_hash=asset.current_hash,
             is_consistent=asset.is_consistent
         )
@@ -69,8 +70,13 @@ class SQLAlchemyAssetRepository(AssetRepositoryInterface):
             dept_stats[dept_name] = {"total": dept_total, "healthy": dept_healthy}
 
         # Recent scans (Audit Log)
-        recent_scans_db = self.db.query(models.ScanResult).order_by(models.ScanResult.scanned_at.desc()).limit(10).all()
-        recent_scans = [ScanResult.model_validate(obj) for obj in recent_scans_db]
+        recent_scans_db = self.db.query(models.ScanResult).order_by(models.ScanResult.scanned_at.desc()).limit(15).all()
+        recent_scans = []
+        for obj in recent_scans_db:
+            res = ScanResult.model_validate(obj)
+            # Fetch baseline details for better UI context
+            res.details = f"[{obj.baseline.name}] {obj.baseline.location} - {res.details}"
+            recent_scans.append(res)
 
         return DashboardStats(
             total_assets=total_assets,

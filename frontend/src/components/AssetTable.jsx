@@ -52,12 +52,14 @@ const AssetTable = ({ assets, onRefresh }) => {
   }, [assets, searchTerm, sortConfig]);
 
   const handleDownloadCSV = () => {
-    const headers = ['Asset Name', 'Path', 'Status', 'Last Check'];
+    const headers = ['자산명 (Asset Name)', '분류 (Category)', '경로 (Path)', '상태 (Status)', '마지막 검사 (Last Check)', '설명 (Description)'];
     const rows = processedAssets.map(asset => [
       asset.name,
+      asset.department || 'N/A',
       asset.path,
       asset.is_consistent ? '정상 (Consistent)' : '변조됨 (Tampered)',
-      asset.last_scanned_at ? new Date(asset.last_scanned_at).toLocaleString() : 'Never'
+      asset.last_scanned_at ? new Date(asset.last_scanned_at).toLocaleString() : 'Never',
+      asset.description || ''
     ]);
 
     const csvContent = [
@@ -123,6 +125,12 @@ const AssetTable = ({ assets, onRefresh }) => {
                 </th>
                 <th 
                   className="px-4 py-2 font-semibold cursor-pointer group hover:text-white transition-colors select-none"
+                  onClick={() => requestSort('department')}
+                >
+                  <div className="flex items-center">Category <SortIcon columnKey="department" /></div>
+                </th>
+                <th 
+                  className="px-4 py-2 font-semibold cursor-pointer group hover:text-white transition-colors select-none"
                   onClick={() => requestSort('path')}
                 >
                   <div className="flex items-center">Path <SortIcon columnKey="path" /></div>
@@ -147,7 +155,10 @@ const AssetTable = ({ assets, onRefresh }) => {
                 processedAssets.map((asset) => (
                   <tr key={asset.id} className="bg-white/5 hover:bg-white/10 transition-colors group">
                     <td className="px-3 md:px-4 py-4 rounded-l-xl font-medium text-sm md:text-base whitespace-nowrap">{asset.name}</td>
-                    <td className="px-3 md:px-4 py-4 text-sl-muted text-xs md:text-sm font-jetbrains truncate max-w-[120px] md:max-w-[200px]">
+                    <td className="px-3 md:px-4 py-4 text-sl-accent/80 text-xs font-bold uppercase tracking-wider whitespace-nowrap">
+                      {asset.department}
+                    </td>
+                    <td className="px-3 md:px-4 py-4 text-sl-muted text-xs md:text-sm font-jetbrains truncate max-w-[120px] md:max-w-[150px]">
                       {asset.path}
                     </td>
                     <td className="px-3 md:px-4 py-4 whitespace-nowrap">

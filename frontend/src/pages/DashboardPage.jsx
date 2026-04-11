@@ -4,8 +4,8 @@ import axios from 'axios';
 import StatCard from '../components/StatCard';
 import AssetTable from '../components/AssetTable';
 import IntegrityChart from '../components/IntegrityChart';
-import DepartmentChart from '../components/DepartmentChart';
 import AuditLog from '../components/AuditLog';
+import AssetDetailModal from '../components/AssetDetailModal';
 
 const API_BASE_URL = 'http://localhost:8000/api';
 
@@ -21,6 +21,8 @@ const DashboardPage = ({ onOpenSidebar }) => {
   const [assets, setAssets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [scanning, setScanning] = useState(false);
+  const [selectedAsset, setSelectedAsset] = useState(null);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -51,22 +53,22 @@ const DashboardPage = ({ onOpenSidebar }) => {
           "Sensor": { "total": 60, "healthy": 56 }
         },
         recent_scans: [
-          { id: 1, scanned_path: "/opt/sf/nodes/ulsan/plc_logic", is_consistent: false, scanned_at: new Date().toISOString(), details: "Unauthorized binary modification detected." },
-          { id: 2, scanned_path: "/opt/sf/nodes/gumi/vision/sensor_calib.dat", is_consistent: true, scanned_at: new Date().toISOString(), details: "Integrity check passed (SHA-256 matched)." }
+          { id: 1, scanned_path: "/opt/sf/nodes/ulsan/plc_logic", is_consistent: false, scanned_at: new Date().toISOString(), details: "[Siemens-S7-1500-001] Ulsan-Main-Plant-A - Unauthorized binary modification detected.", department: "PLC 로직 컨트롤러", name: "Siemens-S7-1500-001", location: "Ulsan-Main-Plant-A" },
+          { id: 2, scanned_path: "/opt/sf/nodes/gumi/vision/sensor_calib.dat", is_consistent: true, scanned_at: new Date().toISOString(), details: "[Keyence-CV-X-088] Gumi-Electronic-B - Integrity check passed (SHA-256 matched).", department: "R&D 설계 보안", name: "Keyence-CV-X-088", location: "Gumi-Electronic-B" }
         ]
       });
       // Realistic fallback assets for demo environments (e.g. GitHub Pages)
       setAssets([
-        { id: 1001, name: "Siemens-S7-1500-001", path: "/opt/sf/nodes/ulsan/plc_logic/main_logic.bin", is_consistent: true, department: "PLC", last_scanned_at: new Date().toISOString() },
-        { id: 1002, name: "ABB-IRB-6700-042", path: "/opt/sf/nodes/ulsan/robotics/arm_control.exe", is_consistent: false, department: "Robot", last_scanned_at: new Date().toISOString() },
-        { id: 1003, name: "Mazak-Integrex-v2-015", path: "/opt/sf/nodes/changwon/cnc/tooling.cfg", is_consistent: true, department: "CNC", last_scanned_at: new Date().toISOString() },
-        { id: 1004, name: "Keyence-CV-X-088", path: "/opt/sf/nodes/gumi/vision/sensor_calib.dat", is_consistent: true, department: "Sensor", last_scanned_at: new Date().toISOString() },
-        { id: 1005, name: "Industrial PLC Logic", path: "/opt/sf/nodes/ulsan/plc_logic", is_consistent: false, department: "Smart Factory A", last_scanned_at: new Date().toISOString() },
-        { id: 1006, name: "Fanuc-R-2000iD-112", path: "/opt/sf/nodes/whasung/robotics/sequence.bin", is_consistent: true, department: "Robot", last_scanned_at: new Date().toISOString() },
-        { id: 1007, name: "DMG-Mori-CTX-003", path: "/opt/sf/nodes/changwon/cnc/spindle.cfg", is_consistent: true, department: "CNC", last_scanned_at: new Date().toISOString() },
-        { id: 1008, name: "Omron-ZW-7000-056", path: "/opt/sf/nodes/gumi/vision/depth_map.bin", is_consistent: true, department: "Sensor", last_scanned_at: new Date().toISOString() },
-        { id: 1009, name: "Daifuku-RGV-Mk3-009", path: "/opt/sf/nodes/ulsan/logistics/route.cfg", is_consistent: true, department: "Logistics", last_scanned_at: new Date().toISOString() },
-        { id: 1010, name: "HVAC-System-P1-001", path: "/opt/sf/nodes/pyeongtaek/infra/hvac_ctrl.log", is_consistent: true, department: "Infrastructure", last_scanned_at: new Date().toISOString() }
+        { id: 1001, name: "Siemens-S7-1500-001", path: "/opt/sf/nodes/ulsan/plc_logic/main_logic.bin", is_consistent: true, department: "PLC 로직 컨트롤러", location: "Ulsan-Main-Plant-A", last_scanned_at: new Date().toISOString() },
+        { id: 1002, name: "ABB-IRB-6700-042", path: "/opt/sf/nodes/ulsan/robotics/arm_control.exe", is_consistent: false, department: "PLC 로직 컨트롤러", location: "Ulsan-Main-Plant-A", last_scanned_at: new Date().toISOString() },
+        { id: 1003, name: "Mazak-Integrex-v2-015", path: "/opt/sf/nodes/changwon/cnc/tooling.cfg", is_consistent: true, department: "MES 서버 설정", location: "Changwon-Machine-C", last_scanned_at: new Date().toISOString() },
+        { id: 1004, name: "Keyence-CV-X-088", path: "/opt/sf/nodes/gumi/vision/sensor_calib.dat", is_consistent: true, department: "R&D 설계 보안", location: "Gumi-Electronic-B", last_scanned_at: new Date().toISOString() },
+        { id: 1005, name: "Industrial PLC Logic", path: "/opt/sf/nodes/ulsan/plc_logic", is_consistent: false, department: "PLC 로직 컨트롤러", location: "Ulsan-Main-Plant-A", last_scanned_at: new Date().toISOString() },
+        { id: 1006, name: "Fanuc-R-2000iD-112", path: "/opt/sf/nodes/whasung/robotics/sequence.bin", is_consistent: true, department: "백업 데이터베이스", location: "Whasung-Automotive-D", last_scanned_at: new Date().toISOString() },
+        { id: 1007, name: "DMG-Mori-CTX-003", path: "/opt/sf/nodes/changwon/cnc/spindle.cfg", is_consistent: true, department: "MES 서버 설정", location: "Changwon-Machine-C", last_scanned_at: new Date().toISOString() },
+        { id: 1008, name: "Omron-ZW-7000-056", path: "/opt/sf/nodes/gumi/vision/depth_map.bin", is_consistent: true, department: "R&D 설계 보안", location: "Gumi-Electronic-B", last_scanned_at: new Date().toISOString() },
+        { id: 1009, name: "Daifuku-RGV-Mk3-009", path: "/opt/sf/nodes/ulsan/logistics/route.cfg", is_consistent: true, department: "백업 데이터베이스", location: "Ulsan-Main-Plant-A", last_scanned_at: new Date().toISOString() },
+        { id: 1010, name: "HVAC-System-P1-001", path: "/opt/sf/nodes/pyeongtaek/infra/hvac_ctrl.log", is_consistent: true, department: "MES 서버 설정", location: "Pyeongtaek-Semicon-1", last_scanned_at: new Date().toISOString() }
       ]);
     } finally {
       setLoading(false);
@@ -151,30 +153,34 @@ const DashboardPage = ({ onOpenSidebar }) => {
         </div>
 
         <div className="space-y-6">
-          <div className="space-y-2">
+          <div className="space-y-4 pt-2">
             <div className="flex items-center gap-2 mb-2">
               <Activity className="text-sl-accent" size={20} />
-              <h2 className="text-xl font-bold text-white font-satoshi">전체 무결성 지수</h2>
+              <h2 className="text-xl font-bold text-white font-satoshi capitalize">전체 무결성 지수</h2>
             </div>
             <IntegrityChart stats={stats} />
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-4 pt-6">
             <div className="flex items-center gap-2 mb-2">
               <Shield className="text-sl-accent" size={20} />
-              <h2 className="text-sm font-bold text-white font-satoshi uppercase tracking-wider">부서별 보안 상태</h2>
-            </div>
-            <div className="glass-panel p-4 border-zinc-800">
-              <DepartmentChart deptStats={stats.department_stats} />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 mb-2">
-              <Activity className="text-sl-accent" size={20} />
               <h2 className="text-sm font-bold text-white font-satoshi uppercase tracking-wider">실시간 보안 감사 (Audit)</h2>
             </div>
-            <AuditLog scans={stats.recent_scans} />
+            <AuditLog 
+              scans={stats.recent_scans} 
+              onAssetClick={(scan) => {
+                // Find asset from local list or construct one
+                const asset = assets.find(a => a.name === scan.details.split(']')[0].replace('[', '')) || {
+                  name: scan.details.split(']')[0].replace('[', ''),
+                  department: scan.is_consistent ? "PLC 로직 컨트롤러" : "위변조 탐지됨",
+                  location: scan.details.split(' - ')[0].split('] ')[1],
+                  path: scan.scanned_path,
+                  is_consistent: scan.is_consistent
+                };
+                setSelectedAsset(asset);
+                setShowModal(true);
+              }}
+            />
           </div>
           
           <div className="glass-panel p-6 border-zinc-800">
@@ -185,6 +191,13 @@ const DashboardPage = ({ onOpenSidebar }) => {
           </div>
         </div>
       </div>
+
+      {showModal && (
+        <AssetDetailModal 
+          asset={selectedAsset} 
+          onClose={() => setShowModal(false)} 
+        />
+      )}
     </div>
   );
 };

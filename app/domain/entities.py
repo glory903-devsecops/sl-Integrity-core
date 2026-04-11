@@ -8,6 +8,7 @@ class Asset(BaseModel):
     path: str
     description: Optional[str] = None
     department: Optional[str] = None
+    location: Optional[str] = None
     current_hash: Optional[str] = None
     last_scanned_at: Optional[datetime] = None
     is_consistent: bool = True

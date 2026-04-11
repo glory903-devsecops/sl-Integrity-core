@@ -7,7 +7,8 @@ const ERPPage = ({ onOpenSidebar }) => {
     name: '',
     path: '',
     description: '',
-    department: 'Smart Factory A'
+    department: 'PLC 로직 컨트롤러',
+    location: 'Ulsan-Main-Plant-A'
   });
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [showExplorer, setShowExplorer] = useState(false);
@@ -81,7 +82,13 @@ const ERPPage = ({ onOpenSidebar }) => {
       
       // Reset wizard
       setCurrentStep(1);
-      setFormData({ name: '', path: '', description: '', department: 'Smart Factory A' });
+      setFormData({ 
+        name: '', 
+        path: '', 
+        description: '', 
+        department: 'PLC 로직 컨트롤러',
+        location: 'Ulsan-Main-Plant-A'
+      });
       setSelectedTemplate(null);
     } catch (error) {
       console.error(error);
@@ -251,17 +258,30 @@ const ERPPage = ({ onOpenSidebar }) => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-sl-muted uppercase tracking-widest px-1">담당 관리 부서</label>
+                  <label className="text-[10px] font-bold text-sl-muted uppercase tracking-widest px-1">담당 관리 부서 (Category)</label>
                   <select 
                     value={formData.department}
                     onChange={(e) => setFormData({...formData, department: e.target.value})}
                     className="w-full bg-black/40 border border-zinc-800 p-4 rounded-xl text-white outline-none focus:border-sl-accent/50 appearance-none"
                   >
-                    <option>Smart Factory A</option>
-                    <option>Smart Factory B</option>
-                    <option>Quality Control B</option>
-                    <option>R&D Center</option>
-                    <option>IT Infrastructure</option>
+                    <option>PLC 로직 컨트롤러</option>
+                    <option>MES 서버 설정</option>
+                    <option>R&D 설계 보안</option>
+                    <option>백업 데이터베이스</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold text-sl-muted uppercase tracking-widest px-1">물리적 설치 위치 (Location)</label>
+                  <select 
+                    value={formData.location}
+                    onChange={(e) => setFormData({...formData, location: e.target.value})}
+                    className="w-full bg-black/40 border border-zinc-800 p-4 rounded-xl text-white outline-none focus:border-sl-accent/50 appearance-none"
+                  >
+                    <option>Ulsan-Main-Plant-A</option>
+                    <option>Gumi-Electronic-B</option>
+                    <option>Pyeongtaek-Semicon-1</option>
+                    <option>Changwon-Machine-C</option>
+                    <option>Whasung-Automotive-D</option>
                   </select>
                 </div>
                 <div className="col-span-full space-y-2">
